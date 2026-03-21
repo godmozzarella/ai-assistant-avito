@@ -32,24 +32,42 @@ export type ItemParams =
   | RealEstateItemParams
   | ElectronicsItemParams;
 
-export interface Item {
+export type AdListItem = {
+  id: string;
+  category: Category;
+  title: string;
+  price: number;
+  needsRevision: boolean;
+  image?: string;
+};
+
+export type Ad = {
   id: string;
   category: Category;
   title: string;
   description?: string;
   price: number;
-  createdAt: string;
-  imageUrl?: string | null;
-  params: ItemParams;
+  createdAt?: string;
+  updatedAt?: string;
+  image?: string;
   needsRevision?: boolean;
-}
+  params: ItemParams;
+};
 
-export interface ItemsResponse<T> {
+export type ItemsResponse<T> = {
   items: T[];
   total: number;
-}
+};
 
-export interface GetItemsParams {
+export type UpdateAdPayload = {
+  category: Category;
+  title: string;
+  description?: string;
+  price: number;
+  params: ItemParams;
+};
+
+export type GetAdsParams = {
   q?: string;
   limit?: number;
   skip?: number;
@@ -57,12 +75,4 @@ export interface GetItemsParams {
   categories?: Category[];
   sortColumn?: SortColumn;
   sortDirection?: SortDirection;
-}
-
-export interface UpdateItemInput {
-  category: Category;
-  title: string;
-  description?: string;
-  price: number;
-  params: ItemParams;
-}
+};
