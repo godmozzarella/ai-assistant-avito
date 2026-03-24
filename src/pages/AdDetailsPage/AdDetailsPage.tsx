@@ -5,48 +5,57 @@ import type { Ad } from '../../shared/types/ad'
 import { CircularProgress, Typography, Box, Card, CardContent, Badge, Button } from '@mui/material'
 
 export function AdDetailsPage() {
-  // Получаем id из URL
   const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
-  const [item, setItem] = useState<Ad | null>(null)
+  const [ad, setAd] = useState<Ad | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
  useEffect(() => {
   if (!id) return
   adApi.getAdById(id)
-    .then(data => setItem(data))
+    .then(data => setAd(data))
     .catch(err => setError(err.message))
     .finally(() => setLoading(false))
 }, [id])
 
   if (loading) return <CircularProgress />
   if (error) return <Typography color="error">Ошибка: {error}</Typography>
-  if (!item) return <Typography>Объявление не найдено</Typography>
+  if (!ad) return <Typography>Объявление не найдено</Typography>
 
   return (
     <Box>
-      <Button onClick={() => navigate(-1)} sx={{ mb: 2 }}>
+      <Button onClick={() => navigate('/ads')} sx={{ mb: 2 }}>
         Назад
       </Button>
       <Card sx={{ mb: 2 }}>
         <CardContent>
-          <Typography variant="h4">{item.title}</Typography>
-          <Typography variant="subtitle1">Категория: {item.category}</Typography>
-          <Typography variant="body1">Цена: {item.price} ₽</Typography>
-          {item.description && <Typography mt={1}>{item.description}</Typography>}
-          {item.needsRevision && <Badge color="warning">Требует доработок</Badge>}
-          <Typography variant="body2">
-            Дата создания: {item.createdAt ? new Date(item.createdAt).toLocaleString() : '-'}
-          </Typography>
-          <Typography variant="body2">
-            Дата обновления: {item.updatedAt ? new Date(item.updatedAt).toLocaleString() : '-'}
-          </Typography>
-
+          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <Typography variant="h4">{ad.title}</Typography>
+              <button
+                onClick={() => navigate(`/ads/${ad.id}/edit`)}
+              >Редактировать</button>
+            </div>
+            <div>  
+              <Typography variant="body1">Цена: {ad.price} ₽</Typography> 
+              <Typography variant="body2">
+                Дата создания: {ad.createdAt ? new Date(ad.createdAt).toLocaleString() : '-'}
+              </Typography>
+              <Typography variant="body2">
+                Дата обновления: {ad.updatedAt ? new Date(ad.updatedAt).toLocaleString() : '-'}
+              </Typography>
+            </div>
+          </header>    
+          
+          {ad.description && <Typography mt={1}>{ad.description}</Typography>}
+          {ad.needsRevision && <Badge color="warning">Требует доработок</Badge>}
+          <Typography variant="subtitle1">Категория {ad.category}</Typography>
           <Box mt={2}>
-            <Typography variant="h6">Параметры:</Typography>
+            <Typography variant="h6">Характеристики:</Typography>
+            
             <ul>
-              {Object.entries(item.params).map(([key, value]) => (
+              {Object.entries(ad.params).map(([key, value]) => (
                 <li key={key}>
                   {key}: {String(value)}
                 </li>

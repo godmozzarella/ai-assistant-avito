@@ -1,5 +1,4 @@
 export type Category = 'auto' | 'real_estate' | 'electronics';
-
 export type SortColumn = 'title' | 'createdAt';
 export type SortDirection = 'asc' | 'desc';
 
@@ -59,12 +58,12 @@ export type ItemsResponse<T> = {
   total: number;
 };
 
-export type UpdateAdPayload = {
-  category: Category;
+export type ItemUpdateIn = {
+  category: 'auto' | 'real_estate' | 'electronics';
   title: string;
   description?: string;
   price: number;
-  params: ItemParams;
+  params: AutoItemParams | RealEstateItemParams | ElectronicsItemParams;
 };
 
 export type GetAdsParams = {

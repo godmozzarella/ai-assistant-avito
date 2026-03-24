@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import Fastify from 'fastify'
 
 import items from 'data/items.json' with { type: 'json' };
 import { Item } from 'src/types.ts';
@@ -14,16 +14,16 @@ const fastify = Fastify({
 
 await fastify.register((await import('@fastify/middie')).default);
 
+await fastify.register((await import('@fastify/cors')).default, {
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+});
+
 // Искуственная задержка ответов, чтобы можно было протестировать состояния загрузки
 fastify.use((_, __, next) =>
   new Promise(res => setTimeout(res, 300 + Math.random() * 700)).then(next),
 );
-
-// Настройка CORS
-fastify.use((_, reply, next) => {
-  reply.setHeader('Access-Control-Allow-Origin', '*');
-  next();
-});
 
 interface ItemGetRequest extends Fastify.RequestGenericInterface {
   Params: {

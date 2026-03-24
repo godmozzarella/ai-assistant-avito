@@ -5,6 +5,7 @@ import PageLoader from '../../shared/ui/PageLoader';
 import ErrorState from '../../shared/ui/ErrorState';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import DropDownMenu from '../../shared/ui/DropDownMenu';
 
 export function AdsListPage() {
   const navigate = useNavigate();
@@ -30,14 +31,14 @@ export function AdsListPage() {
     }
   };
 
-    const options: Option[] = [
-      { label: 'По новизне (сначала новые)', value: 'newest' },
-      { label: 'По новизне (сначала старые)', value: 'oldest' },
-      { label: 'По цене (сначала дешевле)', value: 'cheap' },
-      { label: 'По цене (сначала дороже)', value: 'expensive' },
-      { label: 'По названию (А-Я)', value: 'name_az' },
-      { label: 'По названию (Я-А)', value: 'name_za' },
-    ];
+  const options: Option[] = [
+    { label: 'По новизне (сначала новые)', value: 'newest' },
+    { label: 'По новизне (сначала старые)', value: 'oldest' },
+    { label: 'По цене (сначала дешевле)', value: 'cheap' },
+    { label: 'По цене (сначала дороже)', value: 'expensive' },
+    { label: 'По названию (А-Я)', value: 'name_az' },
+    { label: 'По названию (Я-А)', value: 'name_za' },
+  ];
   const [selected, setSelected] = useState<Option>(options[0]);
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
@@ -117,21 +118,13 @@ export function AdsListPage() {
         </div>
 
          <div>
-      <button type="button" onClick={() => setIsOpen((prev) => !prev)}>
-        {selected.label}
-      </button>
-
-      {isOpen && (
-        <ul>
-          {options.map((option) => (
-            <li key={option.value}>
-              <button type="button" onClick={() => handleSelect(option)}>
-                {option.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <DropDownMenu
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        selected={selected}
+        options={options}
+        handleSelect={handleSelect}
+      />
     </div>
       </div>
       <Stack spacing={2}>

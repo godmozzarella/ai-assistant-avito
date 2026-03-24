@@ -4,7 +4,7 @@ import type {
   AdListItem,
   GetAdsParams,
   ItemsResponse,
-  UpdateAdPayload,
+  ItemUpdateIn,
 } from '../types/ad';
 
 export const adApi = {
@@ -56,7 +56,7 @@ export const adApi = {
     return data;
   },
 
-  async updateAd(id: string, payload: UpdateAdPayload) {
+  async updateAd(id: string, payload: ItemUpdateIn) {
     const { data } = await http.put(`/items/${id}`, payload);
     return data;
   },
