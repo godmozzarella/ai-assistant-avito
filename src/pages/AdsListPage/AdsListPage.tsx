@@ -1,35 +1,47 @@
-import { useQuery } from '@tanstack/react-query';
-import { Container, Typography, Stack, Card, CardContent} from '@mui/material';
-import { adApi } from '../../shared/api/adApi';
-import PageLoader from '../../shared/ui/PageLoader';
-import ErrorState from '../../shared/ui/ErrorState';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import DropDownMenu from '../../shared/ui/DropDownMenu';
+import ViewListIcon from '@mui/icons-material/FormatListBulleted'
+import GridViewIcon from '@mui/icons-material/GridView'
+import SearchIcon from '@mui/icons-material/Search'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Container, FormControlLabel, Switch} from '@mui/material'
+import Checkbox from '@mui/material/Checkbox';
+import CheckBoxOutlineBlankRoundedIcon from '@mui/icons-material/CheckBoxOutlineBlankRounded';
+import CheckBoxRoundedIcon from '@mui/icons-material/CheckBoxRounded';
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { adApi } from '../../shared/api/adApi'
+import DropDownMenu from '../../shared/ui/DropDownMenu/DropDownMenu'
+import ErrorState from '../../shared/ui/ErrorState'
+import PageLoader from '../../shared/ui/PageLoader'
+import Ad from './Ad'
+import type { Category } from '../../shared/types/ad'
+import s from './AdsListPage.module.scss'
 
 export function AdsListPage() {
-  const navigate = useNavigate();
-  
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+	const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
+	const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+	const [onlyRequiringRework, setOnlyRequiringRework] = useState(false);
+
   type Option = {
-      label: string;
-      value: string;
-    };
+    label: string
+    value: string
+  }
 
   const getSortParams = (sortValue: Option['value']) => {
     switch (sortValue) {
       case 'newest':
-        return { sortColumn: 'createdAt' as const, sortDirection: 'desc' as const };
+        return { sortColumn: 'createdAt' as const, sortDirection: 'desc' as const }
       case 'oldest':
-        return { sortColumn: 'createdAt' as const, sortDirection: 'asc' as const };
+        return { sortColumn: 'createdAt' as const, sortDirection: 'asc' as const }
       case 'name_az':
-        return { sortColumn: 'title' as const, sortDirection: 'asc' as const };
+        return { sortColumn: 'title' as const, sortDirection: 'asc' as const }
       case 'name_za':
-        return { sortColumn: 'title' as const, sortDirection: 'desc' as const };
+        return { sortColumn: 'title' as const, sortDirection: 'desc' as const }
       default:
-        return {};
+        return {}
     }
-  };
+  }
 
   const options: Option[] = [
     { label: 'По новизне (сначала новые)', value: 'newest' },
@@ -37,12 +49,13 @@ export function AdsListPage() {
     { label: 'По цене (сначала дешевле)', value: 'cheap' },
     { label: 'По цене (сначала дороже)', value: 'expensive' },
     { label: 'По названию (А-Я)', value: 'name_az' },
-    { label: 'По названию (Я-А)', value: 'name_za' },
-  ];
-  const [selected, setSelected] = useState<Option>(options[0]);
-  const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
-  const sortParams = getSortParams(selected.value);
+    { label: 'По названию (Я-А)', value: 'name_za' }
+  ]
+
+  const [selected, setSelected] = useState<Option>(options[0])
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+  const sortParams = getSortParams(selected.value)
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['ads', search, selected.value],
@@ -51,105 +64,184 @@ export function AdsListPage() {
         limit: 1000,
         skip: 0,
         q: search || undefined,
-        ...sortParams,
-      }),
-  });
+        ...sortParams
+      })
+  })
 
-  if (isLoading) {
-    return <PageLoader />;
-  }
+  if (isLoading) return <PageLoader />
 
-  if (isError) {
+  if (isError)
     return (
-      <Container> 
+      <Container>
         <ErrorState
           message={error instanceof Error ? error.message : 'Не удалось загрузить объявления'}
         />
       </Container>
-    );
+    )
+
+  const allCategories: Category[] = ['auto', 'real_estate', 'electronics']
+
+	const announcementEndWord =
+		Math.abs(data?.total ?? 0) % 10 === 1 && (data?.total ?? 0) !== 11 ? 'е' :
+		Math.abs(data?.total ?? 0) % 10 === 2 || 
+		Math.abs(data?.total ?? 0) % 10 === 3 || 
+		Math.abs(data?.total ?? 0) % 10 === 4 ? 'я' :
+		'й';
+
+  const handleCategoryToggle = (category: Category) => {
+    setSelectedCategories(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    )
   }
 
-  const announcementEndWord =
-    Math.abs(data?.total ?? 0) % 10 === 1 && (data?.total ?? 0) !== 11 ? 'е' :
-    Math.abs(data?.total ?? 0) % 10 === 2 || 
-    Math.abs(data?.total ?? 0) % 10 === 3 || 
-    Math.abs(data?.total ?? 0) % 10 === 4 ? 'я' :
-    'й';
+	const filteredAds = (data?.items ?? []).filter(ad => {
+  const categoryMatch =
+    selectedCategories.length > 0
+      ? selectedCategories.includes(ad.category)
+      : true;
 
-  const handleSelect = (option: Option) => {
-    if (option.value === 'cheap' || option.value === 'expensive') {
-      setIsOpen(false);
-      return;
-    }
+  const reworkMatch = onlyRequiringRework
+    ? ad.needsRevision
+    : true;
 
-    setSelected(option);
-    setIsOpen(false);
-  };
-
- const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setSearch(searchInput.trim());
-};
-
-
+  return categoryMatch && reworkMatch;
+});
 
   return (
-    <Container sx={{ py: 4 }}>
-      <Typography variant="h4" mb={3}>
-        Мои объявления 
-      </Typography>
-      <Typography variant="body1" mb={3}>
-        {data?.total ?? 0} объявлени{announcementEndWord}
-      </Typography>
-      <div>
+    <div className={s.body}>
+      {/* Верхний заголовок */}
+      <header className={s.header}>
+        <div className={s.headerContent}>
+          <h1 className={s.title}>Мои объявления</h1>
+          <p className={s.announcementCount}>
+            {data?.total ?? 0} объявлени{announcementEndWord}
+          </p>
+        </div>
+      </header>
 
-        <form onSubmit={handleSearchSubmit}>
-          <input 
+      {/* Панель инструментов */}
+      <section className={s.toolbar}>
+        <form className={s.searchContainer} onSubmit={e => { e.preventDefault(); setSearch(searchInput.trim()) }}>
+          <input
+            className={s.searchInput}
             type="search"
-            placeholder="Найти объявление..." 
+            placeholder="Найти объявление..."
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={e => setSearchInput(e.target.value)}
           />
+          <button type="submit" className={s.searchIcon}>
+            <SearchIcon sx={{ color: 'rgba(0, 0, 0, 0.85)' }} />
+          </button>
         </form>
 
-        <div>
-          <button>Сетка</button>
-          <button>Список</button>
+        <div className={s.actions}>
+          <div className={s.viewToggle}>
+            <button className={`${s.viewButton} ${s.gridView}`}>
+              <GridViewIcon />
+            </button>
+            <button className={`${s.viewButton} ${s.listView}`}>
+              <ViewListIcon />
+            </button>
+          </div>
+
+          <DropDownMenu
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            selected={selected}
+            options={options}
+            handleSelect={o => { setSelected(o); setIsOpen(false) }}
+          />
         </div>
+      </section>
 
-         <div>
-      <DropDownMenu
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        selected={selected}
-        options={options}
-        handleSelect={handleSelect}
-      />
+      {/* Главная часть с боковой панелью */}
+      <main className={s.main}>
+        <aside className={s.filters}>
+          <div className={s.filtersContent}>
+            <h2>Фильтры</h2>
+
+						{/* Фильтр по категориям */}
+            <div className={s.filterBlock}>
+							<p
+								className={s.filterTitle}
+								onClick={() => setIsCategoriesOpen(prev => !prev)}
+							>
+								Категория {isCategoriesOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+							</p>
+
+							{isCategoriesOpen && (
+								<div className={s.filterList}>
+									{allCategories.map(cat => (
+											<FormControlLabel
+												sx={{
+														'& .MuiFormControlLabel-label': {
+														fontSize: '0.875rem',
+														fontWeight: 400,
+														fontFamily: 'Roboto, sans-serif',
+														color: 'rgba(0,0,0,0.85)',
+													},
+												}}
+												control={
+													<Checkbox
+														checked={selectedCategories.includes(cat)}
+														onChange={() => handleCategoryToggle(cat)}
+														icon={<CheckBoxOutlineBlankRoundedIcon />}  
+														checkedIcon={<CheckBoxRoundedIcon />}     
+														sx={{
+															color: 'rgb(195, 193, 202)',       
+															'&.Mui-checked': {
+																color: 'rgba(24, 144, 255, 1)',        
+															},
+															margin: 0
+														}} 
+													/>
+												}
+												label={cat === 'auto' ? 'Авто' : cat === 'real_estate' ? 'Недвижимость' : 'Электроника'}
+											/>
+									))}
+								</div>
+							)}
+						</div>
+            <hr />
+						<div className={s.requiringRework}>
+							<p>Только требующие доработок</p>
+							<FormControlLabel
+								sx={{ margin: 0 }}
+								control={
+									<Switch
+										checked={onlyRequiringRework}
+										onChange={() => setOnlyRequiringRework(prev => !prev)}
+										color="primary"
+									/>
+								}
+								label=""
+							/>
+						</div>
+          </div>
+
+          <button className={`${s.resetFilters} ${
+						selectedCategories.length > 0 || onlyRequiringRework
+							? s.resetFiltersActive
+							: ''
+						}`}
+						onClick={() => {
+							setSelectedCategories([])
+							setOnlyRequiringRework(false)
+						}}
+					>
+						Сбросить фильтры
+					</button>
+        </aside>
+
+        {/* Список объявлений */}
+        <section className={s.adsGrid}>
+          {filteredAds.map(ad => (
+            <Ad key={ad.id} ad={ad} />
+          ))}
+        </section>
+      </main>
     </div>
-      </div>
-      <Stack spacing={2}>
-        {data?.items.map((ad) => (
-          <Card
-            key={ad.id}
-            onClick={() => navigate(`/ads/${ad.id}`)}
-            sx={{ cursor: 'pointer' }}
-          >
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                {ad.category}
-              </Typography>
-
-              <Typography variant="h6">{ad.title}</Typography>
-
-              <Typography variant="body1">{ad.price} ₽</Typography>
-
-              <Typography variant="body2">
-                {ad.needsRevision ? 'Требует доработок' : 'Заполнено'}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))}
-      </Stack>
-    </Container>
-  );
+  )
 }

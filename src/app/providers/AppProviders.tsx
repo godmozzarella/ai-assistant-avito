@@ -1,11 +1,10 @@
-import { RouterProvider } from 'react-router-dom';
-import { router } from '../router/router';
+import type { ReactNode } from 'react';
 import QueryProvider from './QueryProvider';
 
-export function AppProviders() {
-  return (
-    <QueryProvider>
-      <RouterProvider router={router} />
-    </QueryProvider>
-  );
+type AppProvidersProps = {
+  children: ReactNode;
+};
+
+export default function AppProviders({ children }: AppProvidersProps) {
+  return <QueryProvider>{children}</QueryProvider>;
 }
