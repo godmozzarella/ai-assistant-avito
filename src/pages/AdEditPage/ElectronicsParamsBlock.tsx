@@ -9,7 +9,7 @@ export function ElectronicsParamsBlock({ params, onChange, required, isInvalid }
         <select
           value={params.type ?? ''}
           onChange={e => onChange({ ...params, type: e.target.value as 'phone' | 'laptop' | 'misc' })}
-          className={`${s.select} ${isInvalid ? s.invalid : ''}`}
+          className={`${s.select} ${!params.type ? s.warning : ''} ${isInvalid ? s.invalid : ''}`}
         >
           <option value="">Выберите тип</option>
           <option value="phone">Телефон</option>
@@ -18,19 +18,22 @@ export function ElectronicsParamsBlock({ params, onChange, required, isInvalid }
         </select>
       </Field>
       <Field label="Бренд" characteristics>
-        <input value={params.brand ?? ''} onChange={e => onChange({ ...params, brand: e.target.value })} />
+        <input value={params.brand ?? ''} onChange={e => onChange({ ...params, brand: e.target.value })} 
+        placeholder='Бренд' className={`${params.brand ? '' : s.warning}`}/>
       </Field>
       <Field label="Модель" characteristics>
-        <input value={params.model ?? ''} onChange={e => onChange({ ...params, model: e.target.value })} />
+        <input value={params.model ?? ''} onChange={e => onChange({ ...params, model: e.target.value })} 
+        placeholder='Модель' className={`${params.model ? '' : s.warning}`}/>
       </Field>
       <Field label="Состояние" characteristics>
-        <select className={s.select} value={params.condition ?? ''} onChange={e => onChange({ ...params, condition: e.target.value as 'new' | 'used' })}>
+        <select className={`${s.select} ${!params.condition ? s.warning : ''}`} value={params.condition ?? ''} onChange={e => onChange({ ...params, condition: e.target.value as 'new' | 'used' })}>
           <option value="new">Новое</option>
           <option value="used">Б/У</option>
         </select>
       </Field>
       <Field label="Цвет" characteristics>
-        <input value={params.color ?? ''} onChange={e => onChange({ ...params, color: e.target.value })} />
+        <input value={params.color ?? ''} onChange={e => onChange({ ...params, color: e.target.value })} 
+        placeholder='Цвет' className={`${params.color ? '' : s.warning}`}/>
       </Field>
     </>
   )

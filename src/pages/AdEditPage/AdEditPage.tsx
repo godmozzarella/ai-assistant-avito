@@ -23,8 +23,14 @@ export function AdEditPage() {
 	const navigate = useNavigate()
 	const [ad, setAd] = useState<Ad | null>(null)
 	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+	const [, setError] = useState<string | null>(null)
 	const [invalidFields, setInvalidFields] = useState<{ [key: string]: boolean }>({})
+	const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+	useEffect(() => {
+		if (!notification) return
+		const t = setTimeout(() => setNotification(null), 3000)
+		return () => clearTimeout(t)
+	}, [notification])
 
 	useEffect(() => {
 		if (!id) return
@@ -107,16 +113,28 @@ export function AdEditPage() {
 		try {
 			localStorage.setItem(`draft-ad-${ad.id}`, JSON.stringify(ad))
 			await adApi.updateAd(ad.id, ad)
-
-			navigate(`/ads/${ad.id}`)
+			setNotification({ type: 'success', message: 'Изменения сохранены' })
+			setTimeout(() => {
+				navigate(`/ads/${ad.id}`)
+			}, 1000)
 		} catch (err: unknown) {
 			const message = (err as Error).message || 'Ошибка при сохранении'
 			setError(message)
+			setNotification({
+				type: 'error',
+				message:
+					'Ошибка сохранения. При попытке сохранить изменения произошла ошибка. Попробуйте ещё раз или зайдите позже.'
+			})
 		}
 	}
 
 	return (
 		<div className={s.container}>
+			{notification && (
+				<div className={`${s.toast} ${notification.type === 'success' ? s.toastSuccess : s.toastError}`}>
+					{notification.message}
+				</div>
+			)}
 			<h1 className={s.title}>Редактирование объявления</h1>
 			<form className={s.editForm}>
 				<Field label="Категория">
@@ -154,7 +172,6 @@ export function AdEditPage() {
 
 				<hr />
 				
-				
 				<Field label="Цена" required={true}>
 					<input
 						className={isInvalid('price') ? s.invalid : ''}
@@ -185,7 +202,7 @@ export function AdEditPage() {
 
 				<Field label="Описание">
 					<textarea
-						className={s.textarea}
+						className={`${s.textarea} ${!ad.description?.trim() ? s.warning : ''}`}
 						value={ad.description}
 						maxLength={1000} 
 						onChange={e => setAd({ ...ad, description: e.target.value })}

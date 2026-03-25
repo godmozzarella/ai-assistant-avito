@@ -96,13 +96,15 @@ export function AiPrice({ title, category, params, currentPrice, onApply}: AiPri
       </button>
 
       {showTooltip && (
-        <div className={s.aiTooltip}>
+         <div className={`${s.aiTooltip} ${error ? s.error : ''}`}>
           {error ? (
             <>
-              <p className={s.error}>Произошла ошибка при запросе к AI: {error}</p>
-              <button 
-              className={s.closeBtn} 
-              onClick={() => setShowTooltip(false)}>
+              <h2 className={s.errorTitle}>Произошла ошибка при запросе к AI:</h2>
+              <p className={s.aiText}>Попробуйте повторить запрос или закройте уведомление</p>
+               <button
+                className={s.closeErrBtn}
+                onClick={() => setShowTooltip(false)}
+              >
                 Закрыть
               </button>
             </>

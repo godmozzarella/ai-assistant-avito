@@ -29,13 +29,12 @@
 	label div {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: 0.25rem;
 	}
 
 	.invalid {
 		border: 1px solid red !important;
 	}
-
 }
 
 	.select {
@@ -109,3 +108,39 @@ input, .select{
 	}
 }
 
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 0.5rem 1rem;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 0.875rem;
+  z-index: 1000;
+  max-width: 320px;
+
+  transform: translateX(120%);
+  opacity: 0;
+  animation: slideIn 0.3s ease forwards;
+}
+
+.toastSuccess {
+  background-color: rgba(246, 255, 237, 1);
+	border: 1px solid rgba(183, 235, 143, 1);
+}
+
+.toastError {
+  background-color: rgba(255, 241, 240, 1);
+	border: 1px solid rgba(255, 204, 199, 1);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.warning{
+	border: 1px solid rgba(255, 169, 64, 1);
+}

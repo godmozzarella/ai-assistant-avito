@@ -21,53 +21,17 @@
   &.loading {
     pointer-events: none;
     opacity: 0.6;
-  }пфз
+  }
 
   svg {
     font-size: 1.25rem;
   }
 }
 
-.aiTooltip {
-  position: relative;
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.12);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-top: 0.5rem;
-  width: 20.75rem;
-  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.08);
-  z-index: 10;
-
-  .aiTitle, .aiText {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    font-size: 0.75rem;
-    color: rgba(0, 0, 0, 0.87);
-    margin: 0;
-  }
-
-  .aiText {
-    font-weight: 400;
-  }
-}
-
-.aiError {
-  color: #d32f2f;
-  font-weight: 500;
-}
-
-.aiButtons {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 0.625rem;
-
-
-  button {
+button {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
     padding: 0.25rem 0.25rem;
     border-radius: 0.25rem;
     border: none;
@@ -79,6 +43,51 @@
 
     cursor: pointer;
   }
+
+.aiTooltip {
+  position: relative;
+
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.12);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  width: 20.75rem;
+  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+
+  &.error {
+    background: rgba(254, 233, 231, 1);
+
+    .errorTitle {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      font-size: 0.75rem;
+      color: rgba(192, 15, 12, 1);
+      margin: 0;
+    }
+
+    .closeErrBtn{
+      background-color: rgba(252, 179, 173, 1);
+    } 
+  }
+
+  .aiTitle, .aiText {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .aiText {
+    font-weight: 400;
+  }
+}
+
+.aiButtons {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0.625rem;
 
   .applyBtn {
     background-color: rgba(24, 144, 255, 1);

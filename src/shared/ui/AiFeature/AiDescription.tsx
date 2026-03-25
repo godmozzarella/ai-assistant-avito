@@ -105,12 +105,13 @@ export function AiDescription({
       </button>
 
       {showTooltip && (
-        <div className={s.aiTooltip}>
+        <div className={`${s.aiTooltip} ${error ? s.error : ''}`}>
           {error ? (
             <>
-              <p className={s.error}>Произошла ошибка при запросе к AI: {error}</p>
+              <h2 className={s.errorTitle}>Произошла ошибка при запросе к AI:</h2>
+              <p className={s.aiText}>Попробуйте повторить запрос или закройте уведомление</p>
               <button
-                className={s.closeBtn}
+                className={s.closeErrBtn}
                 onClick={() => setShowTooltip(false)}
               >
                 Закрыть
