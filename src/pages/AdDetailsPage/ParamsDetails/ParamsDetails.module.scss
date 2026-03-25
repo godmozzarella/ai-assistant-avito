@@ -1,0 +1,28 @@
+.param {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  gap: 1rem; 
+
+  p {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.45);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  & > p:first-child {
+    width: 10rem; 
+  }
+
+  .value {
+    flex: 1; 
+    text-align: left;
+    font-weight: 400;
+    color: rgba(30, 30, 30, 1);
+    word-break: break-word;    
+    white-space: normal;  
+  }
+}

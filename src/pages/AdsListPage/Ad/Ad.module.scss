@@ -1,0 +1,102 @@
+.ad {
+	display: flex;
+	flex-direction: column;
+
+	border-radius: 1rem;
+	border: 1px solid rgba(240, 240, 240, 1);
+	background-color: rgba(255, 255, 255, 1);
+	min-height: 16.75rem;
+	cursor: pointer;
+
+	.imageWrapper {
+		position: relative;
+
+		.image {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			border-top-right-radius: 1rem;
+			border-top-left-radius: 1rem;
+			border-bottom-left-radius: 0.5rem;
+			border-bottom-right-radius: 0.5rem;
+		}
+
+		.category {
+			position: absolute;
+			bottom: -1.5rem;
+			left: 1rem;
+
+			background-color: rgba(255, 255, 255, 1);
+			border-radius: 0.5rem;
+			border: 1px solid rgba(217, 217, 217, 1);
+			padding: 0.125rem 0.5rem;
+
+			font-family: 'Roboto', sans-serif;
+			font-size: 0.875rem;
+			color: rgba(0, 0, 0, 0.85);
+		}
+	}
+	
+		.adsInfo {
+			display: flex;
+			flex-direction: column;
+			padding: 1.375rem 1rem 1rem 1rem;
+			gap: 0.25rem;
+
+			p{
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				margin: 0;
+				padding: 0;
+
+			}
+			
+			.title {
+				font-family: 'Roboto', sans-serif;
+				font-size: 1rem;
+				font-weight: 400;
+				line-height: 1.5rem;
+				color: rgba(0, 0, 0, 0.85);
+			}
+			
+			.price {
+				display: flex;
+				align-items: center;
+
+				font-family: 'Inter', sans-serif;
+				font-size: 1rem;
+				font-weight: 400;
+				color: rgba(0, 0, 0, 0.45);
+			}
+
+			.statusContainer {
+				display: flex;
+				align-items: center;
+				background-color: rgba(249, 241, 230, 1);
+				color: rgba(250, 173, 20, 1);
+
+				border-radius: 0.5rem;
+				padding: 0.125rem 0.5rem;
+				gap: 0.5rem;
+
+				b {
+					font-size: 1.125rem;
+				}
+				
+				.status {
+					font-family: 'Roboto', sans-serif;
+					font-size: 0.875rem;
+					font-weight: 400;
+					line-height: 1.375rem;
+				}
+			}
+			
+			
+		
+		}
+
+}
+
+
+

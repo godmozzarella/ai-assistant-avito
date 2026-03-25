@@ -1,5 +1,4 @@
 export type Category = 'auto' | 'real_estate' | 'electronics';
-
 export type SortColumn = 'title' | 'createdAt';
 export type SortDirection = 'asc' | 'desc';
 
@@ -32,24 +31,42 @@ export type ItemParams =
   | RealEstateItemParams
   | ElectronicsItemParams;
 
-export interface Item {
+export type AdListItem = {
+  id: string;
+  category: Category;
+  title: string;
+  price: number;
+  needsRevision: boolean;
+  image?: string;
+};
+
+export type Ad = {
   id: string;
   category: Category;
   title: string;
   description?: string;
   price: number;
-  createdAt: string;
-  imageUrl?: string | null;
-  params: ItemParams;
+  createdAt?: string;
+  updatedAt?: string;
+  image?: string;
   needsRevision?: boolean;
-}
+  params: ItemParams;
+};
 
-export interface ItemsResponse<T> {
+export type ItemsResponse<T> = {
   items: T[];
   total: number;
-}
+};
 
-export interface GetItemsParams {
+export type ItemUpdateIn = {
+  category: 'auto' | 'real_estate' | 'electronics';
+  title: string;
+  description?: string;
+  price: number;
+  params: AutoItemParams | RealEstateItemParams | ElectronicsItemParams;
+};
+
+export type GetAdsParams = {
   q?: string;
   limit?: number;
   skip?: number;
@@ -57,12 +74,4 @@ export interface GetItemsParams {
   categories?: Category[];
   sortColumn?: SortColumn;
   sortDirection?: SortDirection;
-}
-
-export interface UpdateItemInput {
-  category: Category;
-  title: string;
-  description?: string;
-  price: number;
-  params: ItemParams;
-}
+};
