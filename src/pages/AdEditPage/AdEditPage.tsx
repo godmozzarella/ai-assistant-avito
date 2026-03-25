@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { adApi } from '../../shared/api/adApi'
-import { AiDescription } from '../../shared/ui/AiDescription/AiDescription'
+import { AiDescription } from '../../shared/ui/AiFeature/AiDescription'
+import { AiPrice } from '../../shared/ui/AiFeature/AiPrice'
+
 import type {
 	Ad,
 	AutoItemParams,
@@ -151,7 +153,8 @@ export function AdEditPage() {
 				</Field>
 
 				<hr />
-
+				
+				
 				<Field label="Цена" required={true}>
 					<input
 						className={isInvalid('price') ? s.invalid : ''}
@@ -167,6 +170,13 @@ export function AdEditPage() {
 							}}
 						/>
 				</Field>
+				<AiPrice
+						title={ad.title}
+						category={ad.category}
+						params={ad.params ?? {}}
+						currentPrice={ad.price}
+						onApply={price => setAd(prev => prev ? { ...prev, price } : prev)}
+				/>
 
 				<hr />
 

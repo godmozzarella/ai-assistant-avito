@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import EmojiObjectsOutlinedIcon from '@mui/icons-material/EmojiObjectsOutlined'
-import s from './AiDescription.module.scss'
+import s from './AiFeature.module.scss'
 
 interface AiDescriptionProps {
   value: string
@@ -89,7 +89,7 @@ export function AiDescription({
   }
 
   return (
-    <div className={s.aiBlock}>
+    <div>
       <button
         className={s.improveDescription}
         type="button"
@@ -98,7 +98,7 @@ export function AiDescription({
       >
         <EmojiObjectsOutlinedIcon />
         {loading
-          ? 'Загрузка…'
+          ? 'Выполняется запрос'
           : value.trim()
           ? 'Улучшить описание'
           : 'Придумать описание'}
@@ -108,7 +108,7 @@ export function AiDescription({
         <div className={s.aiTooltip}>
           {error ? (
             <>
-              <p className={s.error}>{error}</p>
+              <p className={s.error}>Произошла ошибка при запросе к AI: {error}</p>
               <button
                 className={s.closeBtn}
                 onClick={() => setShowTooltip(false)}
@@ -121,9 +121,7 @@ export function AiDescription({
               <h2 className={s.aiTitle}>Ответ AI:</h2>
               <p className={s.aiText}>{aiText}</p>
               <div className={s.aiButtons}>
-                <button
-                  className={s.applyBtn}
-                  onClick={() => {
+                <button className={s.applyBtn} onClick={() => {
                     if (aiText) onApply(aiText)
                     setShowTooltip(false)
                   }}
