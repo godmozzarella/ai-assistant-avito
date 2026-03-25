@@ -8,6 +8,8 @@ import {
   KeyboardArrowUp as KeyboardArrowUpIcon,
   Search as SearchIcon
 } from '@mui/icons-material'
+import ArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
+import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRightOutlined';
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { adApi } from '../../shared/api/adApi'
@@ -23,6 +25,8 @@ export function AdsListPage() {
 	const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
 	const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
 	const [onlyRequiringRework, setOnlyRequiringRework] = useState(false)
+	const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 12
 
 	type Option = {
 		label: string
@@ -119,6 +123,14 @@ export function AdsListPage() {
 
 		return categoryMatch && reworkMatch
 	})
+
+	const totalPages = Math.ceil(filteredAds.length / itemsPerPage)
+
+	const startIndex = (currentPage - 1) * itemsPerPage
+	const endIndex = startIndex + itemsPerPage
+
+	const currentAds = filteredAds.slice(startIndex, endIndex)
+
 
 	return (
 		<div className={s.con}>
@@ -272,13 +284,37 @@ export function AdsListPage() {
 				</aside>
 
 				{/* Список объявлений */}
-				<section className={s.adsGrid}>
-					{filteredAds.map(ad => (
-						<Ad
-							key={ad.id}
-							ad={ad}
-						/>
+				<section className={s.adsListSection}>
+					<div className={s.adsGrid}>
+						{currentAds.map(ad => (
+						<Ad key={ad.id} ad={ad} />
 					))}
+					</div>
+					<div className={s.pagination}>
+						<button
+							onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+							disabled={currentPage === 1}
+						>
+							<ArrowLeftIcon/>
+						</button>
+
+						{[...Array(totalPages)].map((_, i) => (
+							<button
+								key={i}
+								className={i + 1 === currentPage ? s.activePage : ''}
+								onClick={() => setCurrentPage(i + 1)}
+							>
+								{i + 1}
+							</button>
+						))}
+
+						<button
+							onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+							disabled={currentPage === totalPages}
+						>
+							<ArrowRightIcon/>
+						</button>
+					</div>
 				</section>
 			</main>
 		</div>

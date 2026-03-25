@@ -228,6 +228,13 @@
 			color: rgba(255, 255, 255, 1);
 		}
 	}
+}
+
+.adsListSection{
+	display: flex;
+	flex-direction: column;
+	gap: 0.625rem;
+	width: 100%;
 
 	.adsGrid{
 		display: grid;
@@ -236,8 +243,32 @@
 		padding-right: 1rem;
 		flex-basis: 80%;
 	}
-}
 
+	.pagination{
+		display: flex;
+		gap: 0.5rem;
+
+		button{
+			width: 2rem;
+			height: 2rem;
+			aspect-ratio: 1/1;
+			background-color: rgba(255, 255, 255, 1);
+			color: rgba(0, 0, 0, 0.85);
+			font-size: 0.875rem;
+			border: 1px solid rgba(217, 217, 217, 1);
+			border-radius: 0.5rem;
+		}
+
+		.activePage{
+			color: rgba(24, 144, 255, 1);
+			border: 1px solid rgba(24, 144, 255, 1);
+		}
+
+		button:disabled{
+			color:  rgba(217, 217, 217, 1);
+		}
+	}
+}
 
 
 
