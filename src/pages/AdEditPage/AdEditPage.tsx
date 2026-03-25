@@ -1,4 +1,3 @@
-import { CircularProgress, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { adApi } from '../../shared/api/adApi'
@@ -9,10 +8,12 @@ import type {
 	ElectronicsItemParams,
 	RealEstateItemParams
 } from '../../shared/types/ad'
-import DropDownMenu from '../../shared/ui/DropDownMenu/DropDownMenu'
 import { AutoParamsBlock } from './AutoParamsBlock'
 import { ElectronicsParamsBlock } from './ElectronicsParamsBlock'
 import { RealEstateParamsBlock } from './RealEstateParamsBlock'
+import { Field } from '../../shared/ui/Field/Field'
+import PageLoader from '../../shared/ui/PageLoader'
+import s from './AdEditPage.module.scss'
 
 export function AdEditPage() {
 	const { id } = useParams<{ id?: string }>()
@@ -20,6 +21,7 @@ export function AdEditPage() {
 	const [ad, setAd] = useState<Ad | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
+	const [invalidFields, setInvalidFields] = useState<{ [key: string]: boolean }>({})
 
 	useEffect(() => {
 		if (!id) return
@@ -30,53 +32,17 @@ export function AdEditPage() {
 			.finally(() => setLoading(false))
 	}, [id])
 
-	const [isCategoryOpen, setIsCategoryOpen] = useState(false)
-	const categories: Category[] = ['auto', 'real_estate', 'electronics']
+	const categoryOptions: { label: string; value: Category }[] = [
+		{ label: 'Авто', value: 'auto' },
+		{ label: 'Недвижимость', value: 'real_estate' },
+		{ label: 'Электроника', value: 'electronics' }
+	]
 
-	const categoryOptions: { label: string; value: Category }[] = categories.map(
-		c => ({
-			label: c,
-			value: c
-		})
-	)
+	if (loading) return <PageLoader />
+	if (!ad) return <p>Объявление не найдено</p>
 
-	if (loading) return <CircularProgress />
-	if (error) return <Typography color="error">Ошибка: {error}</Typography>
-	if (!ad) return <Typography>Объявление не найдено</Typography>
 
-	const handleSelectCategory = (categoryOption: {
-		label: string
-		value: Category
-	}) => {
-		setAd(prev => {
-			if (!prev) return prev
-			let newParams
-			switch (categoryOption.value) {
-				case 'auto':
-					newParams =
-						prev.category === 'auto' && prev.params
-							? prev.params
-							: ({} as AutoItemParams)
-					break
-				case 'real_estate':
-					newParams =
-						prev.category === 'real_estate' && prev.params
-							? prev.params
-							: ({} as RealEstateItemParams)
-					break
-				case 'electronics':
-					newParams =
-						prev.category === 'electronics' && prev.params
-							? prev.params
-							: ({} as ElectronicsItemParams)
-					break
-				default:
-					newParams = prev.params
-			}
-			return { ...prev, category: categoryOption.value, params: newParams }
-		})
-		setTimeout(() => setIsCategoryOpen(false), 0)
-	}
+	const isInvalid = (field: string) => invalidFields[field]
 
 	let ParamsBlock
 	switch (ad.category) {
@@ -97,6 +63,8 @@ export function AdEditPage() {
 					onChange={(newParams: RealEstateItemParams) =>
 						setAd({ ...ad, params: newParams })
 					}
+					required={true}
+					isInvalid={isInvalid('type')}
 				/>
 			)
 			break
@@ -107,15 +75,32 @@ export function AdEditPage() {
 					onChange={(newParams: ElectronicsItemParams) =>
 						setAd({ ...ad, params: newParams })
 					}
+					required={true}
+					isInvalid={isInvalid('type')}
 				/>
 			)
 			break
 	}
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
+	const handleSubmit = async () => {
 		setError(null)
 		if (!ad) return
+		const newInvalidFields = {
+			title: !ad.title.trim(),
+			price: ad.price === undefined || ad.price === null || ad.price <= 0,
+			type:
+				ad.category === 'electronics'
+					? !(ad.params as ElectronicsItemParams).type?.trim()
+					: ad.category === 'real_estate'
+					? !(ad.params as RealEstateItemParams).type?.trim()
+					: false
+		}
+		setInvalidFields(newInvalidFields)
+
+		if (Object.values(newInvalidFields).some(Boolean)) {
+			return
+		}
+
 		try {
 			localStorage.setItem(`draft-ad-${ad.id}`, JSON.stringify(ad))
 			await adApi.updateAd(ad.id, ad)
@@ -128,62 +113,85 @@ export function AdEditPage() {
 	}
 
 	return (
-		<div>
-			<h2>Редактирование объявления</h2>
-			<form onSubmit={handleSubmit}>
-				<label>
-					Категория
-					<DropDownMenu
-						isOpen={isCategoryOpen}
-						setIsOpen={setIsCategoryOpen}
-						selected={{ label: ad.category, value: ad.category }}
-						options={categoryOptions}
-						handleSelect={handleSelectCategory}
-					/>
-				</label>
+		<div className={s.container}>
+			<h1 className={s.title}>Редактирование объявления</h1>
+			<form className={s.editForm}>
+				<Field label="Категория">
+					<select
+						className={s.select}
+						value={ad.category}
+						onChange={e =>
+							setAd(prev => prev ? { ...prev, category: e.target.value as Category } : prev)
+						}
+					>
+						{categoryOptions.map(opt => (
+							<option key={opt.value} value={opt.value}>
+								{opt.label}
+							</option>
+						))}
+					</select>
+				</Field>
 
 				<hr />
 
-				<label>
-					Название
+				<Field label="Название" required={true} >
 					<input
+						className={isInvalid('title') ? s.invalid : ''}
 						type="text"
 						value={ad.title}
-						onChange={e => setAd({ ...ad, title: e.target.value })}
+						required
+						onChange={e => {
+							setAd({ ...ad, title: e.target.value })
+							if (invalidFields.title) {
+								setInvalidFields(prev => ({ ...prev, title: false }))
+							}
+						}}
 					/>
-				</label>
+				</Field>
 
 				<hr />
 
-				<label>
-					Цена
+				<Field label="Цена" required={true}>
 					<input
+						className={isInvalid('price') ? s.invalid : ''}
 						type="number"
-						value={ad.price}
-						onChange={e => setAd({ ...ad, price: Number(e.target.value) })}
-					/>
-				</label>
+							value={ad.price}
+							required
+							min={0}
+							onChange={e => {
+								setAd({ ...ad, price: Number(e.target.value) })
+								if (invalidFields.price) {
+									setInvalidFields(prev => ({ ...prev, price: false }))
+								}
+							}}
+						/>
+				</Field>
 
 				<hr />
 
-				<p>Характеристики</p>
+				<p className={s.paramsTitle}>Характеристики</p>
 				{ParamsBlock}
 
-				<label>
-					Описание
+				<Field label="Описание">
 					<textarea
+						className={s.textarea}
 						value={ad.description}
+						maxLength={1000} 
 						onChange={e => setAd({ ...ad, description: e.target.value })}
 					/>
-				</label>
-
-				<button type="submit">Сохранить</button>
-				<button
-					type="button"
-					onClick={() => navigate(`/ads/${ad.id}`)}
-				>
-					Отмена
-				</button>
+				</Field>
+				
+				<div className={s.buttons}>
+					<button className={s.save} type="button" onClick={handleSubmit}>Сохранить</button>
+					<button
+						className={s.cancel}
+						type="button"
+						onClick={() => navigate(`/ads/${ad.id}`)}
+					>
+						Отмена
+					</button>
+				</div>
+				
 			</form>
 		</div>
 	)

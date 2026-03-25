@@ -41,7 +41,14 @@ export function AdDetailsPage() {
 		if (!id) return
 		adApi
 			.getAdById(id)
-			.then(data => setAd(data))
+			.then(data => {
+				setAd(data)
+				const missing: string[] = []
+				if (!data.description || !data.description.trim()) {
+					missing.push('Описание')
+				}
+				setMissingParams(missing)
+			})
 			.catch(err => setError(err.message))
 			.finally(() => setLoading(false))
 	}, [id])
@@ -123,21 +130,36 @@ export function AdDetailsPage() {
 						{ad.category === 'auto' && (
 							<AutoParams
 								params={ad.params as AutoItemParams}
-								onMissing={setMissingParams}
+								onMissing={(fields) => {
+									setMissingParams(prev => {
+										const merged = new Set([...prev, ...fields])
+										return Array.from(merged)
+									})
+								}}
 							/>
 						)}
 
 						{ad.category === 'real_estate' && (
 							<RealEstateParams
 								params={ad.params as RealEstateItemParams}
-								onMissing={setMissingParams}
+								onMissing={(fields) => {
+									setMissingParams(prev => {
+										const merged = new Set([...prev, ...fields])
+										return Array.from(merged)
+									})
+								}}
 							/>
 						)}
 
 						{ad.category === 'electronics' && (
 							<ElectronicsParams
 								params={ad.params as ElectronicsItemParams}
-								onMissing={setMissingParams}
+								onMissing={(fields) => {
+									setMissingParams(prev => {
+										const merged = new Set([...prev, ...fields])
+										return Array.from(merged)
+									})
+								}}
 							/>
 						)}
 					</section>

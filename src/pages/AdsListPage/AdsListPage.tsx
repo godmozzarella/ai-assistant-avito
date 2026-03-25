@@ -203,6 +203,7 @@ export function AdsListPage() {
 								<div className={s.filterList}>
 									{allCategories.map(cat => (
 										<FormControlLabel
+											key={cat}
 											sx={{
 												'& .MuiFormControlLabel-label': {
 													fontSize: '0.875rem',
