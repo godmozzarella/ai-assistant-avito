@@ -15,7 +15,10 @@ const fastify = Fastify({
 await fastify.register((await import('@fastify/middie')).default);
 
 await fastify.register((await import('@fastify/cors')).default, {
-  origin: 'http://localhost:5173',
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:11434',
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
 });

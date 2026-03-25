@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { adApi } from '../../shared/api/adApi'
+import { AiDescription } from '../../shared/ui/AiDescription/AiDescription'
 import type {
 	Ad,
 	AutoItemParams,
@@ -178,6 +179,13 @@ export function AdEditPage() {
 						value={ad.description}
 						maxLength={1000} 
 						onChange={e => setAd({ ...ad, description: e.target.value })}
+					/>
+					<AiDescription
+						value={ad.description ?? ''}
+						title={ad.title}
+						category={ad.category}
+						params={ad.params ?? {}}
+						onApply={text => setAd(prev => prev ? { ...prev, description: text } : prev)}
 					/>
 				</Field>
 				
