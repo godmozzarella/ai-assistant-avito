@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import PlaceholderImg from '../../assets/img-placeholder.svg';
+import PlaceholderImg from '../../../assets/img-placeholder.svg';
 import CurrencyRubleIcon from '@mui/icons-material/CurrencyRuble';
 import s from './Ad.module.scss';
 

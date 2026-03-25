@@ -10,7 +10,7 @@ export default function PageLoader() {
         justifyContent: 'center',
       }}
     >
-      <CircularProgress />
+      <CircularProgress sx={{ color: 'rgb(56, 161, 100)' }} />
     </Box>
   );
 }
